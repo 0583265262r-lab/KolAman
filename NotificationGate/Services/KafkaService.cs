@@ -1,5 +1,6 @@
 using Confluent.Kafka;
 
+
 namespace NotificationGate.Services;
 
 public class KafkaService : IDisposable

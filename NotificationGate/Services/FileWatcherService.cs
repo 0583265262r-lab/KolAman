@@ -7,6 +7,7 @@ public class FileWatcherService
     private readonly string _alertsPath;
     private readonly KafkaService _kafka;
 
+
     public FileWatcherService(string alertsPath, 
                               KafkaService kafka)
     {
@@ -62,6 +63,7 @@ public class FileWatcherService
             var folder = Path.GetDirectoryName(readyPath);
             if (folder == null)
                 return;
+            
 
             var jsonPath = Path.Combine(folder, "alert.json");
 
