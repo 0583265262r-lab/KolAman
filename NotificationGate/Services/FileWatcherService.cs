@@ -6,11 +6,14 @@ public class FileWatcherService
 {
     private readonly string _alertsPath;
     private readonly KafkaService _kafka;
+    private readonly ILogger<FileWatcherService> _logger;
 
 
     public FileWatcherService(string alertsPath, 
-                              KafkaService kafka)
+                              KafkaService kafka,
+                              ILogger<FileWatcherService> logger)
     {
+        _logger = logger;
         _alertsPath = alertsPath;
         _kafka = kafka;
     }
@@ -51,7 +54,7 @@ public class FileWatcherService
             Console.WriteLine($"FileSystemWatcher error: {e.GetException().Message}");
         };
 
-        Console.WriteLine($"Watching: {_alertsPath}");
+        _logger.LogInformation($"Watching: {_alertsPath}");
         Console.WriteLine("Press Enter to stop.");
         Console.ReadLine();
     }
@@ -69,19 +72,21 @@ public class FileWatcherService
 
             if (!File.Exists(jsonPath))
             {
-                Console.WriteLine($"alert.json not found: {folder}");
+                _logger.LogWarning($"alert.json not found: {folder}");
                 return;
             }
 
             var json = await File.ReadAllTextAsync(jsonPath);
             await _kafka.SendAsync(json);
+            _logger.LogInformation($"Sent to Kafka: {folder}");
 
-            Console.WriteLine($"Sent to Kafka: {folder}");
+            
 
             Directory.Delete(folder, recursive: true);
         }
         catch (Exception ex)
         {
+            _logger.LogWarning($"NotificationGate error: {ex.Message}");
             Console.WriteLine($"NotificationGate error: {ex.Message}");
         }
     }

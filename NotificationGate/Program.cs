@@ -1,37 +1,27 @@
 ﻿using NotificationGate.Services;
-using Elastic.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-var builder = Host.CreateApplicationBuilder(args);
+using var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.SetMinimumLevel(LogLevel.Information);
+    builder.AddConsole();
+});
 
-builder.Logging.AddConsole();
+var programLogger = loggerFactory.CreateLogger("Program");
+var kafkaLogger = loggerFactory.CreateLogger<KafkaService>();
+var fileLogger = loggerFactory.CreateLogger<FileWatcherService>();
 
-
-builder.Logging.AddElasticsearch();
-
-
-var host = builder.Build();
-
-await host.StartAsync();
-
-var logger =
-    host.Services.GetRequiredService<ILogger<Program>>();
 
 var alertsPath = @"C:\Users\user1\OneDrive\שולחן העבודה\final test\alert-simulator\alerts";
 
-logger.LogInformation("Application started");
-using var kafka = new KafkaService("localhost:9092");
-logger.LogInformation("generate kafka");
-var watcher = new FileWatcherService(alertsPath, kafka);
-
+using var kafka = new KafkaService("localhost:9092",kafkaLogger);
+var watcher = new FileWatcherService(alertsPath, kafka,fileLogger);
+programLogger.LogInformation("ServiceStarted");
 
 
 await watcher.ProcessExistingAsync();
 watcher.Start();
 
-await host.StopAsync();
 
 
 
