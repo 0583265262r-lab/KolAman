@@ -30,6 +30,7 @@ consumer = Consumer({
 
 
 consumer.subscribe(["alerts"])
+
 rabbit = RabbitService()
 
 logger.info("Classifier started and listening to Kafka topic alerts")
