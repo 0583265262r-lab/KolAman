@@ -44,6 +44,7 @@ dotnet run
 ```powershell
 cd alert-simulator
 python simulator.py
+
 ```
 ## Why did I choose SQL?.
 I chose SQL because the incoming data is not expected to change and always retains the same structure; furthermore, I implemented validations to ensure that consistency. My reasoning was also based on the fact that SQL is a relational database—there are relationships between the tables, and ultimately, they all represent the same underlying subject matter, even if they are segmented according to user needs. Additionally, SQL makes it easier to retrieve, update, and manage this data.
